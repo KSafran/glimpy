@@ -4,6 +4,7 @@
 glimpy is a Python module for fitting generalized linear models. It's based on the [scikit-learn](https://scikit-learn.org/stable/index.html) API to facilitate use with other scikit-learn tools (pipelines, cross-validation, etc.).
 
 ## Installation
+`pip install git+https://github.com/KSafran/glimpy`
 
 ## Getting Started
 Here is an example of a poisson GLM to help get you started
