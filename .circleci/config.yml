@@ -11,6 +11,4 @@ jobs:
             sudo pip install -r requirements/dev.txt
       - run:
           command: |
-            pytest tests
-      - store_test_results: 
-          path: test-results
+            pytest tests/unit_test_glm.py
