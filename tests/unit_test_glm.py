@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import poisson
 from scipy.special import factorial
-from pyglm.glm import poisson_score, poisson_score_grad, PoissonGLM
+from pyglm.poisson import poisson_score, poisson_score_grad, PoissonGLM
 
 
 def test_poisson_score():
@@ -13,7 +13,7 @@ def test_poisson_score():
     thetas = np.array([1])
     x = np.array([[2], [2]])
     y = np.array([[3], [3]])
-    p_score = poisson_score(x=x, y=y, thetas=thetas)
+    p_score = poisson_score(X=x, y=y, thetas=thetas)
 
     # calculate score by hand
     lam = np.exp(thetas * x)
