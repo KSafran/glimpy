@@ -3,6 +3,7 @@ from scipy.stats import poisson, gamma
 from scipy.special import factorial
 from glimpy.poisson import poisson_score, poisson_score_grad, PoissonGLM
 from glimpy.gamma import GammaGLM, gamma_inverse_score #gamma_inverse_score_grad
+from glimpy.normal import NormalGLM
 
 
 def test_poisson_score():
@@ -132,4 +133,26 @@ def test_gamma_glm():
     score = gglm.score(X, y)
     assert score == gamma_inverse_score(X, y, 1, gglm.coef_)
     assert gglm.intercept_ is None
+
+
+def test_normal_glm():
+    """
+    test that it finds optimum for an easy problem
+    """
+    X = np.array([[1, 0], [0, 1]])
+    y = np.array([[1], [2]])
+    nglm = NormalGLM(fit_intercept=False)
+    nglm.fit(X, y)
+    assert np.isclose(nglm.coef_[0], 1)
+    assert np.isclose(nglm.coef_[1], 2)
+
+    # Test Prediction
+    preds = nglm.predict(X)
+    assert np.isclose(preds[0], 1)
+    assert np.isclose(preds[1], 2)
+
+    # Test Scoring
+    score = nglm.score(X, y)
+    assert np.isclose(score, 0)
+    assert nglm.intercept_ is None
 
