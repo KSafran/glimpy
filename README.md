@@ -1,11 +1,11 @@
-# glimpy
+# Glimpy
 [![CircleCI](https://circleci.com/gh/KSafran/glimpy.svg?style=svg)](https://circleci.com/gh/KSafran/glimpy)  
 
 glimpy is a Python module for fitting generalized linear models. It's based on the [scikit-learn](https://scikit-learn.org/stable/index.html) API to facilitate use with other scikit-learn tools (pipelines, cross-validation, etc.).
 
-# Installation
+## Installation
 
-# Getting Started
+## Getting Started
 Here is an example of a poisson GLM to help get you started
 
 ```python
@@ -39,5 +39,4 @@ Warning: Desired error not necessarily achieved due to precision loss.
 >>> print(pglm.coefficients)
 [-10.01316558   0.04992275   0.08008428]
 ```
-
 
