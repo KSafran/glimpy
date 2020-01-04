@@ -1,0 +1,17 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/app
+    docker: 
+      - image: circleci/python:3.7.4
+    steps:
+      - checkout
+      - restore_cache:
+      - run:
+          command: |
+            sudo pip install -r requirements/dev.txt
+      - run:
+          command: |
+            pytest tests
+      - store_test_results: 
+          path: test-results
