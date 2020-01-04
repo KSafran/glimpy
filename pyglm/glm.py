@@ -5,7 +5,24 @@ from sklearn.base import BaseEstimator
 from scipy.optimize import fmin_bfgs
 
 class GLMBase(BaseEstimator):
-    pass
+    @property
+    def coef_(self):
+        if self.fit_intercept:
+            return self.coefficients[1:]
+        return self.coefficients
+
+    @coef_.setter
+    def coef_(self, coef):
+        if coef.shape != self.coefficients.shape:
+            raise ValueError('coef shape does not match')
+        self.coefficients = coef
+
+    @property
+    def intercept_(self):
+        if self.fit_intercept:
+            return self.coefficients[0]
+        return None
+
 
 def poisson_score(x, y, thetas):
     '''
@@ -29,39 +46,30 @@ def poisson_score_grad(x, y, thetas):
 class PoissonGLM(GLMBase):
     def __init__(self, fit_intercept=True):
         self.fit_intercept = fit_intercept
+        self.coefficients = None
+
 
     def _add_intercept(self, X):
         n_rows = X.shape[0]
-        intercept = np.ones(n_rows)
-        return np.vstack([intercept, X])
+        intercept = np.ones((n_rows, 1))
+        return np.hstack([intercept, X])
 
     def fit(self, X, y):
         if self.fit_intercept:
             X = self._add_intercept(X)
-        coefficients = fmin_bfgs(
+        self.coefficients = fmin_bfgs(
             f=partial(poisson_score, X, y),
             x0=np.zeros(X.shape[1]),
             fprime=partial(poisson_score_grad, X, y))
-        if self.fit_intercept:
-            self.coef_ = coefficients[1:]
-            self.intercept_ = coefficients[0]
-        else:
-            self.coef_ = coefficients
         return self
 
     def predict(self, X):
         if self.fit_intercept:
             X = self._add_intercept(X)
-            coefficients = np.concat([self.intercept_, self.coef_])
-        else:
-            coefficients = self.coef_
-        return np.exp(X @ coefficients.reshape(-1, 1))
+        return np.exp(X @ self.coefficients.reshape(-1, 1))
 
     def score(self, X, y):
         if self.fit_intercept:
             X = self._add_intercept(X)
-            coefficients = np.concat([self.intercept_, self.coef_])
-        else:
-            coefficients = self.coef_
-        return poisson_score(X, y, coefficients)
+        return poisson_score(X, y, self.coefficients)
             

@@ -52,6 +52,28 @@ def test_poisson_glm():
     # Test Scoring
     score = pglm.score(X, y)
     assert score == poisson_score(X, y, pglm.coef_)
+    assert pglm.intercept_ is None
+
+def test_poisson_glm_intercept():
+    '''
+    test that it finds optimum for an easy problem
+    '''
+    X = np.array([[0], [1]])
+    y = np.array([[1], [2]])
+    pglm = PoissonGLM()
+    pglm.fit(X, y)
+    assert np.isclose(pglm.intercept_, 0, atol=1e-6)
+    assert np.isclose(pglm.coef_[0], np.log(2))
+
+    # Test Prediction
+    preds = pglm.predict(X)
+    assert np.isclose(preds[0], 1)
+    assert np.isclose(preds[1], 2)
+
+    # Test Scoring
+    score = pglm.score(X, y)
+    X_i = pglm._add_intercept(X)
+    assert np.isclose(score, poisson_score(X_i, y, np.array([0, np.log(2)])))
 
 
 
