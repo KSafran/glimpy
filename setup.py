@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-with open("reqs/base-requirements.txt") as f:
+with open("requirements/base.txt") as f:
     REQUIREMENTS = f.read().splitlines()
 
 CLASSIFIERS = [
