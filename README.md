@@ -1,3 +1,3 @@
-# pyglm
+# glimpy
 
-pyglm is a Python module for fitting generalized linear models
+glimpy is a Python module for fitting generalized linear models

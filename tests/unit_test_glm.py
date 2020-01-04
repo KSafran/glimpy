@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import poisson
 from scipy.special import factorial
-from pyglm.poisson import poisson_score, poisson_score_grad, PoissonGLM
+from glimpy.poisson import poisson_score, poisson_score_grad, PoissonGLM
 
 
 def test_poisson_score():
