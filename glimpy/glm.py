@@ -1,4 +1,5 @@
 """base class for glms"""
+import numpy as np
 from sklearn.base import BaseEstimator
 
 
@@ -51,6 +52,13 @@ class GLMBase(BaseEstimator):
             raise AttributeError('not fit with intercept_')
         self.coefficients[0] = intercept
         
+    def _add_intercept(self, X):
+        """
+        prepends the X ndarray with an column of 1s
+        """
+        n_rows = X.shape[0]
+        intercept = np.ones((n_rows, 1))
+        return np.hstack([intercept, X])
 
 
 

@@ -1,38 +1,39 @@
 import numpy as np
-from scipy.stats import poisson
+from scipy.stats import poisson, gamma
 from scipy.special import factorial
 from glimpy.poisson import poisson_score, poisson_score_grad, PoissonGLM
+from glimpy.gamma import GammaGLM, gamma_inverse_score #gamma_inverse_score_grad
 
 
 def test_poisson_score():
     """
     poisson score should give us negative log likelihood
-    but without the term that doesn't depend on thetas (log(y!))
+    but without the term that doesn't depend on betas (log(y!))
     https://en.wikipedia.org/wiki/Poisson_regression
     """
-    thetas = np.array([1])
+    betas = np.array([1])
     x = np.array([[2], [2]])
     y = np.array([[3], [3]])
-    p_score = poisson_score(X=x, y=y, thetas=thetas)
+    p_score = poisson_score(X=x, y=y, betas=betas)
 
     # calculate score by hand
-    lam = np.exp(thetas * x)
+    lam = np.exp(betas * x)
     log_likelihood = poisson.logpmf(y, lam)
     score = -np.mean(log_likelihood + np.log(factorial(y)))
     assert np.isclose(p_score, score)
 
 
-def test_poisson_grad():
-    """
-    gradient of scoring function is used for gradient descent
-    optimization algorithms. gradients should be close to 
-    0 at optimums
-    """
-    thetas = np.array([1])
-    x = np.array([np.log(2)])
-    y = np.array([2])
-    score_grad = poisson_score_grad(x, y, thetas)
-    assert np.isclose(score_grad, 0)
+# def test_poisson_grad():
+#     """
+#     gradient of scoring function is used for gradient descent
+#     optimization algorithms. gradients should be close to 
+#     0 at optimum
+#     """
+#     betas = np.array([1])
+#     x = np.array([np.log(2)])
+#     y = np.array([2])
+#     score_grad = poisson_score_grad(x, y, betas)
+#     assert np.isclose(score_grad, 0)
 
 
 def test_poisson_glm():
@@ -77,3 +78,58 @@ def test_poisson_glm_intercept():
     score = pglm.score(X, y)
     X_i = pglm._add_intercept(X)
     assert np.isclose(score, poisson_score(X_i, y, np.array([0, np.log(2)])))
+
+def test_gamma_score():
+    """
+    gamma score should give us something similar to 
+    negative log likelihood, just without parts that dont depend 
+    on the scale parameter
+
+    http://statweb.stanford.edu/~susan/courses/s200/lectures/lect11.pdf
+    """
+    betas = np.array([1])
+    x = np.array([[2], [2]])
+    y = np.array([[3], [3]])
+    g_score = gamma_inverse_score(X=x, y=y, shape=1, betas=betas)
+
+    # calculate score by hand
+    lam = 1.0/(betas * x)
+    log_likelihood = gamma.logpdf(y, scale=lam, a=1)
+    # when shape is 1 the other terms disappear
+    # (shape - 1)*log(y) and log(gamma(1))
+    score = -np.mean(log_likelihood)
+    assert np.isclose(g_score, score)
+
+# def test_gamma_grad():
+#     """
+#     gradient of scoring function is used for gradient descent
+#     optimization algorithms. gradients should be close to 
+#     0 at optimum
+#     """
+#     betas = np.array([0.5, 0.25])
+#     x = np.array([[1, 0], [0, 1]])
+#     y = np.array([[2],[4]])
+#     score_grad = gamma_inverse_score_grad(x, y, shape=1, betas=betas)
+#     assert np.isclose(score_grad, 0)
+
+def test_gamma_glm():
+    """
+    test that it finds optimum for an easy problem
+    """
+    X = np.array([[1, 0], [0, 1]])
+    y = np.array([[1], [2]])
+    gglm = GammaGLM(fit_intercept=False, shape=1)
+    gglm.fit(X, y)
+    assert np.isclose(gglm.coef_[0], 1, atol=1e-6)
+    assert np.isclose(gglm.coef_[1], 0.5)
+
+    # Test Prediction
+    preds = gglm.predict(X)
+    assert np.isclose(preds[0], 1)
+    assert np.isclose(preds[1], 2)
+
+    # Test Scoring
+    score = gglm.score(X, y)
+    assert score == gamma_inverse_score(X, y, 1, gglm.coef_)
+    assert gglm.intercept_ is None
+

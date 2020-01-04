@@ -19,14 +19,6 @@ class PoissonGLM(GLMBase):
         self.fit_intercept = fit_intercept
         self.coefficients = None
 
-    def _add_intercept(self, X):
-        """
-        prepends the X ndarray with an column of 1s
-        """
-        n_rows = X.shape[0]
-        intercept = np.ones((n_rows, 1))
-        return np.hstack([intercept, X])
-
     def fit(self, X, y):
         """
         fits a poisson glm using bfgs
