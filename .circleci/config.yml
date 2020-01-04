@@ -6,7 +6,6 @@ jobs:
       - image: circleci/python:3.7.4
     steps:
       - checkout
-      - restore_cache:
       - run:
           command: |
             sudo pip install -r requirements/dev.txt
