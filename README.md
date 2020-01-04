@@ -36,8 +36,6 @@ Warning: Desired error not necessarily achieved due to precision loss.
          Iterations: 62
          Function evaluations: 388
          Gradient evaluations: 377
-print(pglm.coefficients)
-PoissonGLM(fit_intercept=True)
 >>> print(pglm.coefficients)
 [-10.01316558   0.04992275   0.08008428]
 ```
