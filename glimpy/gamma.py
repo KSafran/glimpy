@@ -1,10 +1,7 @@
-'''
-gamma distributed glms
+'''Gamma Generalized Linear Models
 
-to fit gamma distributed GLMs we hold the shape parameter constant
-and allow the scale parameter to vary. In general, this can be used
-with positive right-skewed data where the variance is proportional to
-the square of the mean
+Fits a gamma distributed GLM by holding the shape parameter constant
+and allowing the scale parameter to vary linearly with predictors.
 '''
 from functools import partial
 import numpy as np
@@ -14,26 +11,58 @@ from .scoring import gamma_inverse_score #gamma_inverse_score_grad
 
 
 class GammaGLM(GLMBase):
-    """
-    a class for fitting poisson GLM based on the scikit-learn API
-    """
+    """Gamma Generalized Linear Model
+
+    Fits a gamma distributed GLM by holding the shape parameter
+    constant. Shape parameter is set using the closed-form
+    estimator found here
+    https://en.wikipedia.org/wiki/Gamma_distribution#Closed-form_estimator
+    it can be overidden by an argument to the GammaGLM 
+    constructor
+
+    Parameters
+    =========
+    fit_intercept: bool, default=True 
+        whether to add an intercept column to X
+
+    link: string, default='inverse'
+        link function to use, one of ['inverse']
+    
+    shape: float, default=None
+        shape parameter to use for fitting. Default behavior uses
+        closed form estimate for k on response data.
+
+    Attributes
+    =========
+    coef_: array of shape (n_features, )
+        estimated coeffients of the gamma model, does not
+        include the intercept coefficient
+
+    intercept_: float
+        estimated model intercept
+
+    coefficients: array of shape (n_features + 1,)
+        estimated coefficients including the intercept
+
+    fit -- fits a GLM given numpy arrays
+    predict -- returns the predicted scale parameter for a 
+    given nd.array of predictor data
+    score -- returns a score for the model given labeled data
+    """ 
 
     def __init__(self, fit_intercept=True, link='inverse', shape=None):
-        """
-        fit_intercept: Bool - whether to add an intercept column
-        to the X ndarray when fitting
-        """
         self.fit_intercept = fit_intercept
         self.link = link
         self.coefficients = None
         self.shape = shape
 
     def fit(self, X, y):
-        """
-        fits a gamma glm using bfgs
+        """Fits a gamma glm using bfgs
 
-        X: two dimensional np.ndarray of predictors
-        y: ndarray two dimensional np.ndarray response shape = (n, 1)
+        Parameters
+        ==========
+        X: np.ndarray of predictors, shape (n_obs, n_features)
+        y: np.ndarray response values, shape (n_obs, 1)
         """ 
         if self.shape is None:
             self.shape = self.estimate_shape(y)
@@ -46,23 +75,29 @@ class GammaGLM(GLMBase):
         )
         return self
 
-    def predict(self, X):
-        """
-        predicts conditional expected value of gamma scale 
-        given X
-        multiply by self.shape to get expected value
-        
-        X: two dimesional nd.array of predictors
+    def predict(self, X, return_scale=False):
+        """Predicts Gamma Model
+
+        Parameters 
+        ==========
+        X: np.ndarray of predictors, shape (n_obs, n_features)
+
+        return_scale: bool, default=False
+            return the scale estimate rather than expected value
+
+        Returns
+        =======
+        np.ndarray of the predictions, shape (n_obs, 1)
         """
         if self.fit_intercept:
             X = self._add_intercept(X)
-        return 1.0/(X @ self.coefficients.reshape(-1, 1))
+        return 1.0/(X @ self.coefficients.reshape(-1, 1)) * self.shape
 
     def score(self, X, y):
-        """
-        scores a gamma glm model using variation of negative 
-        log likelihood that ignores terms that dont depend on
-        model parameters, and holds shape constant
+        """Scores Gamma Model
+
+        Note: this score is a variation of negative log-likelihood that
+        ignores terms that dont depent on model parameters.
 
         X: two dimensional np.ndarray of predictors
         y: ndarray two dimensional np.ndarray response shape = (n, 1)
