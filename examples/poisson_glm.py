@@ -7,7 +7,7 @@ age and weight
 '''
 import numpy as np
 from scipy.stats import poisson
-from glimpy.poisson import PoissonGLM
+from glimpy import PoissonGLM
 
 np.random.seed(10)
 n_samples = 1000
