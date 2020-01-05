@@ -1,8 +1,6 @@
-'''
-normal distributed glms
+'''Normal Generalized Linear Models
 
-same as scikit LinearRegression
-Fit using closed form least squares solution
+Equivalent to OLS Regression
 '''
 from functools import partial
 import numpy as np
@@ -10,24 +8,39 @@ from .glm import GLMBase
 
 
 class NormalGLM(GLMBase):
-    """
-    a class for fitting poisson GLM based on the scikit-learn API
-    """
+    """Normal Generalized Linear Model
+
+    Fits a normal distributed GLM 
+
+    Parameters
+    =========
+    fit_intercept: bool, default=True 
+        whether to add an intercept column to X
+
+    Attributes
+    =========
+    coef_: array of shape (n_features, )
+        estimated coeffients of the model, does not
+        include the intercept coefficient
+
+    intercept_: float
+        estimated model intercept
+
+    coefficients: array of shape (n_features + 1,)
+        estimated coefficients including the intercept
+    """ 
 
     def __init__(self, fit_intercept=True):
-        """
-        fit_intercept: Bool - whether to add an intercept column
-        to the X ndarray when fitting
-        """
         self.fit_intercept = fit_intercept
         self.coefficients = None
 
     def fit(self, X, y):
-        """
-        fits a normal glm using OLS
+        """Fits a normal glm using ols solution
 
-        X: two dimensional np.ndarray of predictors
-        y: ndarray two dimensional np.ndarray response shape = (n, 1)
+        Parameters
+        ==========
+        X: np.ndarray of predictors, shape (n_obs, n_features)
+        y: np.ndarray response values, shape (n_obs, 1)
         """ 
         if self.fit_intercept:
             X = self._add_intercept(X)
@@ -35,21 +48,32 @@ class NormalGLM(GLMBase):
         return self
 
     def predict(self, X):
-        """
-        predicts mean of response given X
-        
-        X: two dimesional nd.array of predictors
+        """Predicts Normal Model
+
+        Parameters 
+        ==========
+        X: np.ndarray of predictors, shape (n_obs, n_features)
+
+        Returns
+        =======
+        np.ndarray of the predictions, shape (n_obs, 1)
         """
         if self.fit_intercept:
             X = self._add_intercept(X)
         return (X @ self.coefficients.reshape(-1, 1))
 
     def score(self, X, y):
-        """
-        mean squared error
+        """Scores Normal Model Using Mean Squared Error
 
-        X: two dimensional np.ndarray of predictors
-        y: ndarray two dimensional np.ndarray response shape = (n, 1)
+        Parameters
+        ==========
+
+        X: np.ndarray of predictors, shape (n_obs, n_features)
+        y: np.ndarray response values, shape (n_obs, 1)
+
+        Returns
+        =======
+        model score on X, y dataset, float
         """
         if self.fit_intercept:
             X = self._add_intercept(X)

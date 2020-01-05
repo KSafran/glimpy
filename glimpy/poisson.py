@@ -7,25 +7,40 @@ from .scoring import poisson_score, poisson_score_grad
 
 
 class PoissonGLM(GLMBase):
-    """
-    a class for fitting poisson GLM based on the scikit-learn API
-    """
+    """Poisson Generalized Linear Model
+
+    Fits a poisson distributed GLM 
+
+    Parameters
+    =========
+    fit_intercept: bool, default=True 
+        whether to add an intercept column to X
+
+    Attributes
+    =========
+    coef_: array of shape (n_features, )
+        estimated coeffients of the model, does not
+        include the intercept coefficient
+
+    intercept_: float
+        estimated model intercept
+
+    coefficients: array of shape (n_features + 1,)
+        estimated coefficients including the intercept
+    """ 
 
     def __init__(self, fit_intercept=True):
-        """
-        fit_intercept: Bool - whether to add an intercept column
-        to the X ndarray when fitting
-        """
         self.fit_intercept = fit_intercept
         self.coefficients = None
 
     def fit(self, X, y):
-        """
-        fits a poisson glm using bfgs
+        """Fits a poisson glm using bfgs
 
-        X: two dimensional np.ndarray of predictors
-        y: ndarray two dimensional np.ndarray response shape = (n, 1)
-        """
+        Parameters
+        ==========
+        X: np.ndarray of predictors, shape (n_obs, n_features)
+        y: np.ndarray response values, shape (n_obs, 1)
+        """ 
         if self.fit_intercept:
             X = self._add_intercept(X)
         self.coefficients = fmin_bfgs(
@@ -36,24 +51,35 @@ class PoissonGLM(GLMBase):
         return self
 
     def predict(self, X):
-        """
-        predicts conditional expected value of poisson distribution
-        given X
-        
-        X: two dimesional nd.array of predictors
+        """Predicts Poisson Model
+
+        Parameters 
+        ==========
+        X: np.ndarray of predictors, shape (n_obs, n_features)
+
+        Returns
+        =======
+        np.ndarray of the predictions, shape (n_obs, 1)
         """
         if self.fit_intercept:
             X = self._add_intercept(X)
         return np.exp(X @ self.coefficients.reshape(-1, 1))
 
     def score(self, X, y):
-        """
-        scores a poisson glm model using variation of negative 
-        log likelihood that ignores terms that dont depend on
-        model parameters
+        """Scores Poisson Model
 
-        X: two dimensional np.ndarray of predictors
-        y: ndarray two dimensional np.ndarray response shape = (n, 1)
+        Note: this score is a variation of negative log-likelihood that
+        ignores terms that dont depent on model parameters.
+
+        Parameters
+        ==========
+
+        X: np.ndarray of predictors, shape (n_obs, n_features)
+        y: np.ndarray response values, shape (n_obs, 1)
+
+        Returns
+        =======
+        model score on X, y dataset, float
         """
         if self.fit_intercept:
             X = self._add_intercept(X)

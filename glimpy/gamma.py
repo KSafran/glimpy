@@ -43,11 +43,6 @@ class GammaGLM(GLMBase):
 
     coefficients: array of shape (n_features + 1,)
         estimated coefficients including the intercept
-
-    fit -- fits a GLM given numpy arrays
-    predict -- returns the predicted scale parameter for a 
-    given nd.array of predictor data
-    score -- returns a score for the model given labeled data
     """ 
 
     def __init__(self, fit_intercept=True, link='inverse', shape=None):
@@ -99,18 +94,33 @@ class GammaGLM(GLMBase):
         Note: this score is a variation of negative log-likelihood that
         ignores terms that dont depent on model parameters.
 
-        X: two dimensional np.ndarray of predictors
-        y: ndarray two dimensional np.ndarray response shape = (n, 1)
+        Parameters
+        ==========
+
+        X: np.ndarray of predictors, shape (n_obs, n_features)
+        y: np.ndarray response values, shape (n_obs, 1)
+
+        Returns
+        =======
+        model score on X, y dataset, float
         """
         if self.fit_intercept:
             X = self._add_intercept(X)
         return gamma_inverse_score(X, y, self.shape, self.coefficients)
 
     def estimate_shape(self, y):
-        '''
+        '''Estimates shape parameter of y data
+
         closed form estimate of gamma shape for observed response
         https://en.wikipedia.org/wiki/Gamma_distribution#Closed-form_estimators
-        y: np.ndarray of postive observed response values
+
+        Parameters
+        ==========
+        y: np.ndarray response values, shape (n_obs, 1)
+
+        Returns
+        =======
+        gamma shape parameter estimate, float
         '''
         N = len(y)
         sum_y = y.sum()

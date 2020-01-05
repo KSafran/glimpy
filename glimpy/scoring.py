@@ -1,14 +1,21 @@
-''' scoring functions for GLMs '''
+'''Scoring Functions for GLMs '''
 import numpy as np
 
 def poisson_score(X, y, betas):
-    """
-    simplified version of negative log likilihood, 
-    ignore term that doesn't depend on model params (log(y!))
+    """Scores Poisson Model
 
-    X: two dimensional np.ndarray of predictors
-    y: two dimensional np.ndarray of response values
-    betas: one dimensional nd.array of coefficients
+    Scores a simplified version of negative log likilihood that 
+    ignores terms that doesn't depend on model params (i.e. log(y!))
+
+    Parameters
+    ==========
+    X: np.ndarray of predictors, shape (n_obs, n_features)
+    y: np.ndarray response values, shape (n_obs, 1)
+    betas: np.ndarray of coefficients, shape (n_features)
+
+    Returns
+    =======
+    Model score, float
     """
     betas = betas.reshape(-1, 1)
     score_i = np.exp(X @ betas) - (y * (X @ betas))
@@ -16,12 +23,20 @@ def poisson_score(X, y, betas):
 
 
 def poisson_score_grad(X, y, betas):
-    """
-    partial derivatives of score with respect to betas
+    """Gradient of Poisson Model Score
 
-    X: two dimensional np.ndarray of predictors
-    y: two dimensional np.ndarray of response values
-    betas: one dimensional nd.array of coefficients
+    Computes gradient of poisson score with respect to the
+    model parameters (betas)
+
+    Parameters
+    ==========
+    X: np.ndarray of predictors, shape (n_obs, n_features)
+    y: np.ndarray response values, shape (n_obs, 1)
+    betas: np.ndarray of coefficients, shape (n_features)
+
+    Returns
+    =======
+    np.array of gradients, shape (n_features)
     """
     betas = betas.reshape(-1, 1)
     grad_i = (X * np.exp(X @ betas)) - (y * X)
@@ -29,21 +44,23 @@ def poisson_score_grad(X, y, betas):
 
 
 def gamma_inverse_score(X, y, shape, betas):
-    """
-    simplified version of negative log likilihood, 
-    we hold the shape parameter constant and vary
-    the scale parameters
+    """Scores Poisson Model
 
-    log-likelihood formula can be found here, use shape, scale
-    parameterization
-    https://en.wikipedia.org/wiki/Gamma_distribution
-    we are holding shape constant and predicting lambda so
-    we can ignore terms without lambda
+    Scores a simplified version of negative log likilihood that 
+    ignores terms that doesn't depend on model params. This asssumes
+    the shape parameter is constant across all observations.
 
-    X: two dimensional np.ndarray of predictors
-    y: two dimensional np.ndarray of response values
-    shape: value of the shape parameter used in scoring
-    betas: one dimensional nd.array of coefficients
+
+    Parameters
+    ==========
+    X: np.ndarray of predictors, shape (n_obs, n_features)
+    y: np.ndarray response values, shape (n_obs, 1)
+    shape: value of shape parameter, positive float
+    betas: np.ndarray of coefficients, shape (n_features)
+
+    Returns
+    =======
+    Model score, float
     """
     link = lambda x: 1.0/x
     xb = X @ betas.reshape(-1, 1)
