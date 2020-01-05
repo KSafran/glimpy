@@ -24,17 +24,17 @@ def test_poisson_score():
     assert np.isclose(p_score, score)
 
 
-# def test_poisson_grad():
-#     """
-#     gradient of scoring function is used for gradient descent
-#     optimization algorithms. gradients should be close to 
-#     0 at optimum
-#     """
-#     betas = np.array([1])
-#     x = np.array([np.log(2)])
-#     y = np.array([2])
-#     score_grad = poisson_score_grad(x, y, betas)
-#     assert np.isclose(score_grad, 0)
+def test_poisson_grad():
+    """
+    gradient of scoring function is used for gradient descent
+    optimization algorithms. gradients should be close to 
+    0 at optimum
+    """
+    betas = np.array([1])
+    x = np.array([np.log(2)])
+    y = np.array([2])
+    score_grad = poisson_score_grad(x, y, betas)
+    assert np.isclose(score_grad, 0)
 
 
 def test_poisson_glm():

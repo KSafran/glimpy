@@ -50,7 +50,6 @@ def gamma_inverse_score(X, y, shape, betas):
     ignores terms that doesn't depend on model params. This asssumes
     the shape parameter is constant across all observations.
 
-
     Parameters
     ==========
     X: np.ndarray of predictors, shape (n_obs, n_features)

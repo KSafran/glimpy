@@ -11,4 +11,4 @@ jobs:
             sudo pip install -r requirements/dev.txt
       - run:
           command: |
-            pytest tests/unit_test_glm.py
+            pytest tests
