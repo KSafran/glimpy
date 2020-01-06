@@ -43,6 +43,28 @@ def poisson_score_grad(X, y, betas):
     return np.sum(grad_i, axis=0)
 
 
+def poisson_deviance(X, y, betas):
+    """Calculates Poisson Model Deviance
+
+    Deviance = 2 * sum(log likelihood saturdated - log likelihood model)
+    where the saturated model is the case where mu_i=y_i
+    https://data.princeton.edu/wws509/notes/a2s5
+
+
+    Parameters
+    ==========
+    X: np.ndarray of predictors, shape (n_obs, n_features)
+    y: np.ndarray response values, shape (n_obs, 1)
+    betas: np.ndarray of coefficients, shape (n_features)
+
+    Returns
+    =======
+    Model deviance, float
+    """
+    mu = np.exp(X @ betas.reshape(-1, 1))
+    score_i = y * np.log(y/mu) - (y - mu)
+    return 2 * (score_i).sum()
+
 def gamma_inverse_score(X, y, shape, betas):
     """Scores Poisson Model
 

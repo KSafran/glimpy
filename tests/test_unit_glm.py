@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.stats import poisson, gamma
 from scipy.special import factorial
+from glimpy.scoring import poisson_deviance
 from glimpy.poisson import poisson_score, poisson_score_grad, PoissonGLM
 from glimpy.gamma import GammaGLM, gamma_inverse_score #gamma_inverse_score_grad
 from glimpy.normal import NormalGLM
@@ -23,6 +24,17 @@ def test_poisson_score():
     score = -np.mean(log_likelihood + np.log(factorial(y)))
     assert np.isclose(p_score, score)
 
+def test_poisson_deviance():
+    """
+    poisson deviance should be zero when our model is equal
+    to the saturated model
+    https://data.princeton.edu/wws509/notes/a2s5
+    """
+    betas = np.array([1])
+    x = np.array([[np.log(2)], [np.log(3)]])
+    y = np.array([[2], [3]])
+    p_deviance = poisson_deviance(X=x, y=y, betas=betas)
+    assert np.isclose(p_deviance, 0)
 
 def test_poisson_grad():
     """
@@ -30,11 +42,20 @@ def test_poisson_grad():
     optimization algorithms. gradients should be close to 
     0 at optimum
     """
-    betas = np.array([1])
-    x = np.array([np.log(2)])
-    y = np.array([2])
+    betas = np.array([np.log(2), np.log(3)])
+    x = np.eye(2)
+    y = np.array([[2], [3]])
     score_grad = poisson_score_grad(x, y, betas)
-    assert np.isclose(score_grad, 0)
+    assert score_grad.shape == betas.shape
+    assert np.all(np.isclose(score_grad, 0))
+
+    # too high
+    score_grad = poisson_score_grad(x, y, betas + 1)
+    assert np.all(score_grad > 0)
+
+    # too low
+    score_grad = poisson_score_grad(x, y, betas - 1)
+    assert np.all(score_grad < 0)
 
 
 def test_poisson_glm():
