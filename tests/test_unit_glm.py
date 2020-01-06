@@ -5,6 +5,7 @@ from glimpy.scoring import poisson_deviance
 from glimpy.poisson import poisson_score, poisson_score_grad, PoissonGLM
 from glimpy.gamma import GammaGLM, gamma_inverse_score #gamma_inverse_score_grad
 from glimpy.normal import NormalGLM
+from glimpy.bernoulli import BernoulliGLM
 
 
 def test_poisson_score():
@@ -161,6 +162,31 @@ def test_gamma_glm():
     assert score == gamma_inverse_score(X, y, 1, gglm.coef_)
     assert gglm.intercept_ is None
 
+
+def test_bernoulli_glm():
+    """
+    test that it finds optimum for an easy problem
+    """
+    x_0 = np.ones(6)
+    x_1 = np.concatenate([np.zeros(3), np.ones(3)])
+    X = np.vstack([x_0, x_1]).T
+    y = np.array([1, 0, 0, 1, 1, 0]).reshape(-1, 1)
+    bglm = BernoulliGLM(fit_intercept=False)
+    bglm.fit(X, y)
+    assert np.isclose(bglm.coef_[0], -np.log(2))
+    assert np.isclose(bglm.coef_[1], 2 * np.log(2))
+
+    # Test Prediction
+    preds = bglm.predict(X)
+    for pred in preds[:3]:
+        assert np.isclose(pred, 1.0/3)
+    for pred in preds[3:]:
+        assert np.isclose(pred, 2.0/3)
+
+    # Test Scoring
+    score = bglm.score(X, y)
+    assert np.isclose(score, -3.819085)
+    assert bglm.intercept_ is None
 
 def test_normal_glm():
     """

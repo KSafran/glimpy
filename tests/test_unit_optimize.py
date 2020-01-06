@@ -1,7 +1,7 @@
 """Test optimization code"""
 import numpy as np
 from scipy.stats import poisson
-from glimpy.optimization import poisson_irls, weighted_ols, working_dependent
+from glimpy.optimization import poisson_irls, weighted_ols, poisson_z
 
 def test_weighted_ols():
     '''test weighted_ols works as expected'''
@@ -17,11 +17,11 @@ def test_weighted_ols():
     betas = weighted_ols(X, y, W)
     assert betas[0][0] == 1.75
 
-def test_working_dependent():
+def test_poisson_z():
     X = np.eye(2)
     y = np.array([[1], [2]])
     betas = np.array([[1], [2]])
-    dep = working_dependent(X, y, betas)
+    dep = poisson_z(X, y, betas)
     assert dep[0][0] == (1 + (1 - np.exp(1))/np.exp(1))
     assert dep[1][0] == (2 + (2 - np.exp(2))/np.exp(2))
 

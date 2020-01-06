@@ -1,5 +1,28 @@
 '''Scoring Functions for GLMs '''
 import numpy as np
+from .link import anti_logit
+
+def bernoulli_score(X, y, betas):
+    """Scores Bernoulli Model
+
+    Scores a simplified version of negative log likelihood that 
+    ignores terms that doesn't depend on model params
+    log L(β) = X{yi log(πi) + (ni − yi) log(1 − πi)},
+
+    Parameters
+    ==========
+    X: np.ndarray of predictors, shape (n_obs, n_features)
+    y: np.ndarray response values, shape (n_obs, 1)
+    betas: np.ndarray of coefficients, shape (n_features)
+
+    Returns
+    =======
+    Model score, float
+    """
+    betas = betas.reshape(-1, 1)
+    pi = anti_logit(X @ betas)
+    score_i = y * np.log(pi) + (1 - y) * np.log(1 - pi)
+    return np.sum(score_i)
 
 def poisson_score(X, y, betas):
     """Scores Poisson Model
