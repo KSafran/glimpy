@@ -69,6 +69,12 @@ def test_poisson_glm():
     assert np.isclose(pglm.coef_[0], 0, atol=1e-6)
     assert np.isclose(pglm.coef_[1], np.log(2))
 
+    # test bfgs too
+    pglm = PoissonGLM(fit_intercept=False)
+    pglm.fit(X, y)
+    assert np.isclose(pglm.coef_[0], 0, atol=1e-6)
+    assert np.isclose(pglm.coef_[1], np.log(2))
+
     # Test Prediction
     preds = pglm.predict(X)
     assert np.isclose(preds[0], 1)
