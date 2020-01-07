@@ -1,6 +1,6 @@
 '''Optimization for GLMs'''
 import numpy as np
-from .link import logit, anti_logit
+from .link import logit, anti_logit, inverse
 
 
 def irls_constructor(initialization, z_function, w_function):
@@ -72,5 +72,36 @@ def bernoulli_beta_init(X, y):
     z = np.log((y + 0.5)/(1 - y + 0.5))
     return weighted_ols(X, z)
 
+# Gamma
+# https://data.princeton.edu/wws509/notes/a2.pdf
+# z = eta + (y - mu) d_eta/d_mu
+# where d# z = eta + (y - mu) d_eta/d_mu
+# where d_eta/d_mu is derivative of the link function
+# gamma inverse link has derivative -1/(x**2)
+# evaluated at trial estimate
+# w = p/[b"(theta) * (d_eta/d_mu)**2]
+# where b"(theta) is the second derivative of
+# B(theta) = -log(-theta) so
+# http://people.stat.sfu.ca/~raltman/stat402/402L25.pdf
+
+
+def gamma_z(X, y, beta):
+    '''Working depending variable for gamma IRLS'''
+    eta = X @ beta
+    mu = inverse(eta)
+    return eta + (y - mu) * (-1 / (eta ** 2))
+
+def gamma_w(X, beta):
+    '''gamma IRLS function for W'''
+    eta = X @ beta
+    mu = anti_logit(eta)
+    return np.eye(X.shape[0]) * 1/ (a * (-1 / (eta ** 2) ** 2)
+
+def gamma_beta_init(X, y):
+    '''gamma IRLS initial beta estimate'''
+    z = inverse(y)
+    return weighted_ols(X, z)
+
 bernoulli_irls = irls_constructor(bernoulli_beta_init, bernoulli_z, bernoulli_w)
 poisson_irls = irls_constructor(poisson_beta_init, poisson_z, poisson_w)
+gamma_irls = irls_constructor(gamma_beta_init, gamma_z, gamma_w)
