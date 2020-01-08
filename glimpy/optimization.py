@@ -14,6 +14,7 @@ def irls_constructor(initialization, z_function, w_function):
         beta_ = initialization(X, y)
 
         for iter_ in range(max_iter):
+            print(beta_)
             w_ = w_function(X, beta_)
             z_ = z_function(X, y, beta_)
             beta_new = weighted_ols(X, z_, w_)
@@ -89,13 +90,18 @@ def gamma_z(X, y, beta):
     '''Working depending variable for gamma IRLS'''
     eta = X @ beta
     mu = inverse(eta)
-    return eta + (y - mu) * (-1 / (eta ** 2))
+    dmu_deta = -1.0 / (eta ** 2)
+    blah = eta + ((y - mu) / dmu_deta)
+    breakpoint()
+    return blah
 
 def gamma_w(X, beta):
     '''gamma IRLS function for W'''
     eta = X @ beta
-    mu = anti_logit(eta)
-    return np.eye(X.shape[0]) * 1/ (a * (-1 / (eta ** 2) ** 2)
+    mu = inverse(eta)
+    dmu_deta = -1.0 / (eta ** 2)
+    blah = np.eye(X.shape[0]) * np.sqrt((dmu_deta ** 2) / (mu ** 2))
+    return blah
 
 def gamma_beta_init(X, y):
     '''gamma IRLS initial beta estimate'''

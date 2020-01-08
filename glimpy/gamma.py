@@ -8,6 +8,7 @@ import numpy as np
 from scipy.optimize import fmin_bfgs
 from .glm import GLMBase
 from .scoring import gamma_inverse_score #gamma_inverse_score_grad
+from .optimization import gamma_irls
 
 
 class GammaGLM(GLMBase):
@@ -32,6 +33,9 @@ class GammaGLM(GLMBase):
         shape parameter to use for fitting. Default behavior uses
         closed form estimate for k on response data.
 
+    method: string, default='irls'
+        method for fitting gamma glm, 'irls' or 'bfgs'
+
     Attributes
     =========
     coef_: array of shape (n_features, )
@@ -45,11 +49,12 @@ class GammaGLM(GLMBase):
         estimated coefficients including the intercept
     """ 
 
-    def __init__(self, fit_intercept=True, link='inverse', shape=None):
+    def __init__(self, fit_intercept=True, link='inverse', shape=None, method='irls'):
         self.fit_intercept = fit_intercept
         self.link = link
         self.coefficients = None
         self.shape = shape
+        self.method = method
 
     def fit(self, X, y):
         """Fits a gamma glm using bfgs
@@ -63,6 +68,10 @@ class GammaGLM(GLMBase):
             self.shape = self.estimate_shape(y)
         if self.fit_intercept:
             X = self._add_intercept(X)
+        if self.method == 'irls':
+            self.coefficients = gamma_irls(X, y)
+            return self
+
         self.coefficients = fmin_bfgs(
             f=partial(gamma_inverse_score, X, y, self.shape),
             x0=np.ones(X.shape[1]),
