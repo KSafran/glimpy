@@ -12,7 +12,25 @@ class GLMBase(BaseEstimator):
     conform to the scikit-learn API while allowing the 
     implementation to store all model coefficients together
     in a single `coefficients` attribute.
+
+    Models are fit using statsmodels implementation of
+    iteratively reweighted least squares. See the 
+    statsmodels documentation for technical details
+    https://www.statsmodels.org/stable/glm.html
+
+    Parameters
+    ==========
+    family: statsmodels.family object, required
+    https://www.statsmodels.org/stable/glm.html#families
+
+    link: sm.families.links object, default None
+    Uses the canonical link if none is specified
+    not all links available for each class. see
+    https://www.statsmodels.org/stable/glm.html#families
+    for details
     '''
+    def __init__(self, family, link=None):
+        self.family = family(link)
 
     @property
     def coef_(self):

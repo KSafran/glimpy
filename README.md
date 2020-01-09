@@ -1,7 +1,7 @@
 # Glimpy
 [![CircleCI](https://circleci.com/gh/KSafran/glimpy.svg?style=svg)](https://circleci.com/gh/KSafran/glimpy)  
 
-glimpy is a Python module for fitting generalized linear models. It's based on the [scikit-learn](https://scikit-learn.org/stable/index.html) API to facilitate use with other scikit-learn tools (pipelines, cross-validation, etc.).
+glimpy is a Python module for fitting generalized linear models. It's based on the [scikit-learn](https://scikit-learn.org/stable/index.html) API to facilitate use with other scikit-learn tools (pipelines, cross-validation, etc.). Models are fit using the [statsmodels](https://www.statsmodels.org/stable/glm.html) package.
 
 ## Installation
 `pip install git+https://github.com/KSafran/glimpy`
