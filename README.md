@@ -33,7 +33,7 @@ Then we will have the expected number of hospital visits vary according to the f
 >>> observed_visits = poisson.rvs(expected_visits)
 ```
   
-Now we can fit a `PoissonGLM` object to try to recover the formula we specified above
+Now we can fit a `GLM` object to try to recover the formula we specified above
 ```python
 >>> X = np.vstack([age, weight]).T
 >>> y = observed_visits
