@@ -39,6 +39,23 @@ Now we can fit a `PoissonGLM` object to try to recover the formula we specified 
 >>> y = observed_visits
 >>> pglm = GLM(fit_intercept=True, family=sm.families.Poisson)
 >>> pglm.fit(X, y)
->>> print(pglm.glm.summary())
+>>> print(pglm.summary())
+                 Generalized Linear Model Regression Results
+==============================================================================
+Dep. Variable:                      y   No. Observations:                 1000
+Model:                            GLM   Df Residuals:                      997
+Model Family:                 Poisson   Df Model:                            2
+Link Function:                    log   Scale:                          1.0000
+Method:                          IRLS   Log-Likelihood:                -3619.1
+Date:                Thu, 09 Jan 2020   Deviance:                       967.43
+Time:                        22:31:35   Pearson chi2:                     961.
+No. Iterations:                     6
+Covariance Type:            nonrobust
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const        -10.0132      0.020   -509.601      0.000     -10.052      -9.975
+x1             0.0499      0.000    301.142      0.000       0.050       0.050
+x2             0.0801      0.000    800.720      0.000       0.080       0.080
+==============================================================================
 ```
-

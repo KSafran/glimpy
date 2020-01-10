@@ -6,16 +6,16 @@ import statsmodels.api as sm
 
 class GLM(BaseEstimator):
     '''Base GLM Class
-    
+
     Extends the scikit-learn BaseEstimator class which allows
-    for simple interaction with scikit-learn API. Properties 
-    for coef_ and intercept_ attributes allow the classes to 
-    conform to the scikit-learn API while allowing the 
+    for simple interaction with scikit-learn API. Properties
+    for coef_ and intercept_ attributes allow the classes to
+    conform to the scikit-learn API while allowing the
     implementation to store all model coefficients together
     in a single `coefficients` attribute.
 
     Models are fit using statsmodels implementation of
-    iteratively reweighted least squares. See the 
+    iteratively reweighted least squares. See the
     statsmodels documentation for technical details
     https://www.statsmodels.org/stable/glm.html
 
@@ -30,7 +30,7 @@ class GLM(BaseEstimator):
     https://www.statsmodels.org/stable/glm.html#families
     for details
 
-    fit_intercept: bool, default=True 
+    fit_intercept: bool, default=True
         whether to add an intercept column to X
     '''
     def __init__(self, family, link=None, fit_intercept=True):
@@ -74,7 +74,7 @@ class GLM(BaseEstimator):
         if not self.fit_intercept:
             raise AttributeError('not fit with intercept_')
         self.glm.params[0] = intercept
-        
+
     def _add_intercept(self, X):
         """Adds intercept to predictor array.
         """
@@ -87,15 +87,15 @@ class GLM(BaseEstimator):
 
         Parameters
         ==========
-        X: array-like 
+        X: array-like
         2-D array of predictors, shape (n_obs, n_features)
-        y: array-like 
+        y: array-like
         array of response values of length n_obs
         offset: array-like, optional
-        a 1-D array of offset values 
+        a 1-D array of offset values
         sample_weights: array-like, optional
-        a 1-D array of weight values 
-        """ 
+        a 1-D array of weight values
+        """
         if self.fit_intercept:
             X = self._add_intercept(X)
         self.glm = sm.GLM(y, X, family=self.family, offset=offset, freq_weights=sample_weight)
@@ -119,19 +119,19 @@ class GLM(BaseEstimator):
     def score(self, X, y, sample_weight=None, score_fun='deviance'):
         '''Return the deviance for a fitted GLM
 
-        X: array-like 
+        X: array-like
         2-D array of predictors, shape (n_obs, n_features)
-        y: array-like 
+        y: array-like
         array of response values of length n_obs
         offset: array-like, optional
-        a 1-D array of offset values 
+        a 1-D array of offset values
         sample_weights: array-like, optional
-        a 1-D array of weight values 
+        a 1-D array of weight values
         score_fun: string, default='deviance
-        what score to return, either 'deviance' to 
+        what score to return, either 'deviance' to
         return deviance or 'nll' to return negative log
         likelihood
-        
+
         Returns
         =======
         float of model deviance (or negative log likelihood)
@@ -144,5 +144,9 @@ class GLM(BaseEstimator):
         else:
             raise ValueError('score_fun not an accepted scoring function')
         return score
-        
-        
+
+    def summary(self):
+        '''
+        Return a summary from statsmodels
+        '''
+        return self.glm.summary()
