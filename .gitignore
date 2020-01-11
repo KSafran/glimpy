@@ -1,3 +1,5 @@
+.cache/
+poisson_glm.py
 *.csv
 *.pyc
 *.swp
