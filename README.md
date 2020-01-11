@@ -15,7 +15,7 @@ Start with basic imports and setup
 ```python
 >>> import numpy as np
 >>> from scipy.stats import poisson
->>> from glimpy import GLM
+>>> from glimpy import GLM, Poisson
 >>>
 >>> np.random.seed(10)
 >>> n_samples = 1000
@@ -33,11 +33,11 @@ Then we will have the expected number of hospital visits vary according to the f
 >>> observed_visits = poisson.rvs(expected_visits)
 ```
   
-Now we can fit a `PoissonGLM` object to try to recover the formula we specified above
+Now we can fit a `GLM` object to try to recover the formula we specified above
 ```python
 >>> X = np.vstack([age, weight]).T
 >>> y = observed_visits
->>> pglm = GLM(fit_intercept=True, family=sm.families.Poisson)
+>>> pglm = GLM(fit_intercept=True, family=Poisson)
 >>> pglm.fit(X, y)
 >>> print(pglm.summary())
                  Generalized Linear Model Regression Results

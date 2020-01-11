@@ -8,7 +8,7 @@ age and weight
 import numpy as np
 from scipy.stats import poisson
 import statsmodels.api as sm
-from ..glimpy import GLM
+from glimpy import GLM, Poisson
 
 np.random.seed(10)
 n_samples = 1000
@@ -26,7 +26,7 @@ observed_visits = poisson.rvs(expected_visits)
 # Fit our Poisson GLM and observe the results
 X = np.vstack([age, weight]).T
 y = observed_visits
-pglm = GLM(fit_intercept=True, family=sm.families.Poisson)
+pglm = GLM(fit_intercept=True, family=Poisson)
 pglm.fit(X, y)
 print(pglm.summary())
 

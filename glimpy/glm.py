@@ -99,7 +99,7 @@ class GLM(BaseEstimator):
         if self.fit_intercept:
             X = self._add_intercept(X)
         self.glm = sm.GLM(y, X, family=self.family, offset=offset, freq_weights=sample_weight)
-        self.glm = self.glm.fit()
+        self.glm = self.glm.fit(start_params=self.family.irls_init(X, y))
         return self
 
     def predict(self, X):

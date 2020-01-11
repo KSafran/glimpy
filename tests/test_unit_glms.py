@@ -2,7 +2,7 @@
 Unit Testing GLMS
 '''
 import numpy as np
-from glimpy.glm import GLM   
+from glimpy import GLM, Poisson, Gamma
 import statsmodels.api as sm
 from scipy.stats.distributions import poisson
 np.random.seed(10)
@@ -16,7 +16,7 @@ def test_gamma_example():
     data = sm.datasets.scotland.load(as_pandas=False)
     X = data.exog
     y = data.endog
-    gamma_glm = GLM(fit_intercept=True, family=sm.families.Gamma)
+    gamma_glm = GLM(fit_intercept=True, family=Gamma)
     gamma_glm.fit(X, y)
 
     # SM Way
@@ -38,7 +38,7 @@ def test_poisson_example():
     observed_visits = poisson.rvs(expected_visits)
     X = np.vstack([age, weight]).T
     y = observed_visits
-    poisson_glm = GLM(fit_intercept=True, family=sm.families.Poisson)
+    poisson_glm = GLM(fit_intercept=True, family=Poisson)
     poisson_glm.fit(X, y)
     assert np.all(np.isclose([age_coef, weight_coef], poisson_glm.coef_, rtol=1e-2))
     assert np.isclose(int_coef, poisson_glm.intercept_, rtol=1e-2)
