@@ -15,7 +15,7 @@ NegativeBinomial = sm.families.family.NegativeBinomial
 Tweedie = sm.families.family.Tweedie
 Binomial = sm.families.family.Binomial
 
-def dummy_irls(self, x, y):
+def dummy_irls(*args, **kwargs):
     return None
 
 for family in [
