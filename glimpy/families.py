@@ -15,13 +15,16 @@ NegativeBinomial = sm.families.family.NegativeBinomial
 Tweedie = sm.families.family.Tweedie
 Binomial = sm.families.family.Binomial
 
+def dummy_irls(self, x, y):
+    return None
+
 for family in [
-    Gaussian, 
+    Gaussian,
     InverseGaussian,
     NegativeBinomial,
     Tweedie,
     Binomial]:
-    family.irls_init = lambda x: None
+    family.irls_init = dummy_irls
 
 class Poisson(sm.families.family.Poisson):
     '''Poisson GLM Class
