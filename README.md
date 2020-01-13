@@ -37,7 +37,7 @@ Now we can fit a `GLM` object to try to recover the formula we specified above
 ```python
 >>> X = np.vstack([age, weight]).T
 >>> y = observed_visits
->>> pglm = GLM(fit_intercept=True, family=Poisson)
+>>> pglm = GLM(fit_intercept=True, family=Poisson())
 >>> pglm.fit(X, y)
 >>> print(pglm.summary())
                  Generalized Linear Model Regression Results
@@ -58,4 +58,11 @@ const        -10.0132      0.020   -509.601      0.000     -10.052      -9.975
 x1             0.0499      0.000    301.142      0.000       0.050       0.050
 x2             0.0801      0.000    800.720      0.000       0.080       0.080
 ==============================================================================
+```
+  
+The upshot of glimpy is that you can use easily use your favorite scikit-learn tools with glimpy GLMs. For example, you can use the scikit-learn `cross_val_score`
+```python
+>>> from sklearn.model_selection import cross_val_score
+>>> print(cross_val_score(pglm, X, y, cv=4))
+[263.11969239 288.58713533 205.7032204  220.68304592]
 ```
