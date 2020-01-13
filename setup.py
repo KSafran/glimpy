@@ -26,7 +26,7 @@ setuptools.setup(
         "scikit-learn",
         "scipy",
         "statsmodels"
-    ]
+    ],
     python_requires='>=3.6',
     license="MIT"
 )
