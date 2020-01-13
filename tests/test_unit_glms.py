@@ -31,7 +31,7 @@ def test_gamma_example(scotland_data):
     https://www.statsmodels.org/stable/glm.html#module-reference
     """
     X, y = scotland_data
-    gamma_glm = GLM(fit_intercept=True, family=Gamma)
+    gamma_glm = GLM(fit_intercept=True, family=Gamma())
     gamma_glm.fit(X, y)
 
     # SM Way
@@ -54,7 +54,7 @@ def test_poisson_example():
     observed_visits = poisson.rvs(expected_visits)
     X = np.vstack([age, weight]).T
     y = observed_visits
-    poisson_glm = GLM(fit_intercept=True, family=Poisson)
+    poisson_glm = GLM(fit_intercept=True, family=Poisson())
     poisson_glm.fit(X, y)
     assert np.all(np.isclose([age_coef, weight_coef], poisson_glm.coef_, rtol=1e-2))
     assert np.isclose(int_coef, poisson_glm.intercept_, rtol=1e-2)
@@ -74,7 +74,7 @@ def test_gaussian(scotland_data):
     test gaussian model
     '''
     X, y = scotland_data
-    gauss_glm = GLM(fit_intercept=True, family=Gaussian)
+    gauss_glm = GLM(fit_intercept=True, family=Gaussian())
     gauss_glm.fit(X, y)
     assert np.isclose(gauss_glm.intercept_, 137.414, rtol=1e-3)
     assert len(gauss_glm.coef_) == 7
@@ -85,7 +85,7 @@ def test_inverse_gaussian(scotland_data):
     test inverse gaussian model
     '''
     X, y = scotland_data
-    igauss_glm = GLM(fit_intercept=True, family=InverseGaussian)
+    igauss_glm = GLM(fit_intercept=True, family=InverseGaussian())
     igauss_glm.fit(X, y)
     assert np.isclose(igauss_glm.intercept_, -0.001072, rtol=1e-3)
     assert len(igauss_glm.coef_) == 7
@@ -104,7 +104,7 @@ def test_binomial():
     visit = bernoulli.rvs(prob_visit)
     X = np.vstack([age, weight]).T
     y = visit
-    binom_glm = GLM(fit_intercept=True, family=Binomial)
+    binom_glm = GLM(fit_intercept=True, family=Binomial())
     binom_glm.fit(X, y)
     assert np.all(np.isclose([age_coef, weight_coef], binom_glm.coef_, rtol=2e-1))
     assert np.isclose(int_coef, binom_glm.intercept_, rtol=1e-1)
@@ -126,7 +126,7 @@ def test_tweedie():
     observed_cost = observed_visits * gamma.rvs(1000)
     X = np.vstack([age, weight]).T
     y = observed_cost
-    tweedie_glm = GLM(fit_intercept=True, family=Tweedie)
+    tweedie_glm = GLM(fit_intercept=True, family=Tweedie())
     tweedie_glm.fit(X, y)
     assert np.all(np.isclose([age_coef, weight_coef], tweedie_glm.coef_, rtol=1e-1))
 
@@ -146,7 +146,7 @@ def test_neg_binomial():
     visits = nbinom.rvs(n=1, p=prob, size=n_samples)
     X = np.vstack([age, weight]).T
     y = visits
-    nbinom_glm = GLM(fit_intercept=True, family=NegativeBinomial)
+    nbinom_glm = GLM(fit_intercept=True, family=NegativeBinomial())
     nbinom_glm.fit(X, y)
     assert np.all(np.isclose([age_coef, weight_coef], nbinom_glm.coef_, rtol=1e-1))
     assert np.isclose(int_coef, nbinom_glm.intercept_, rtol=1e-1)

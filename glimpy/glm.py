@@ -34,7 +34,8 @@ class GLM(BaseEstimator):
         whether to add an intercept column to X
     '''
     def __init__(self, family, link=None, fit_intercept=True):
-        self.family = family(link)
+        # self.family = family(link)
+        self.family = family
         self.fit_intercept = fit_intercept
 
     @property
@@ -114,6 +115,8 @@ class GLM(BaseEstimator):
         =======
         A 1-D array of predicted values
         '''
+        if self.fit_intercept:
+            X = self._add_intercept(X)
         return self.glm.predict(X)
 
     def score(self, X, y, sample_weight=None, score_fun='deviance'):
@@ -136,11 +139,13 @@ class GLM(BaseEstimator):
         =======
         float of model deviance (or negative log likelihood)
         '''
-        fitted = self.predict(X, y)
+        fitted = self.predict(X)
+        if sample_weight is None:
+            sample_weight = 1
         if score_fun == 'deviance':
-            score = self.family.link.deviance(y, fitted, freq_weights=sample_weight)
+            score = self.family.deviance(y, fitted, freq_weights=sample_weight)
         elif score_fun.lower() == 'nll':
-            score = -self.family.link.loglike(y, fitted, freq_weights=sample_weight)
+            score = -self.family.loglike(y, fitted, freq_weights=sample_weight)
         else:
             raise ValueError('score_fun not an accepted scoring function')
         return score

@@ -1,5 +1,6 @@
 .cache/
 poisson_glm.py
+gamma_log_link.py
 *.csv
 *.pyc
 *.swp
