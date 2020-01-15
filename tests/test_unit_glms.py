@@ -59,6 +59,23 @@ def test_poisson_example():
     assert np.all(np.isclose([age_coef, weight_coef], poisson_glm.coef_, rtol=1e-2))
     assert np.isclose(int_coef, poisson_glm.intercept_, rtol=1e-2)
 
+def test_l1_poisson():
+    """
+    test a poisson model
+    """
+    n_samples = 1000
+    int_coef, age_coef, weight_coef = -10, 0.05, 0.08
+    age = np.random.uniform(30, 70, n_samples)
+    weight = np.random.normal(150, 20, n_samples)
+    expected_visits = np.exp(int_coef + age * age_coef + weight * weight_coef)
+    observed_visits = poisson.rvs(expected_visits)
+    X = np.vstack([age, weight]).T
+    y = observed_visits
+    poisson_glm = GLM(fit_intercept=True, family=Poisson(),
+        penalty='l1', C=0.01)
+    poisson_glm.fit(X, y)
+    assert poisson_glm.coef_.sum() < 0.1
+
 
 def test_irls_init():
     """

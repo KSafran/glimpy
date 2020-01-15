@@ -122,7 +122,7 @@ class GLM(BaseEstimator):
         if self.penalty is None:
             self.glm = self.glm.fit(start_params=self.family.irls_init(X, y))
         else:
-            self.glm = self.glm.fit_regularized(method='elasticnet',
+            self.glm = self.glm.fit_regularized(method='elastic_net',
                 alpha=1.0/self.C,
                 start_params=self.family.irls_init(X, y),
                 L1_wt=self.l1_ratio)
