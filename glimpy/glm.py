@@ -24,19 +24,38 @@ class GLM(BaseEstimator):
     family: statsmodels.family object, required
     https://www.statsmodels.org/stable/glm.html#families
 
-    link: sm.families.links object, default None
-    Uses the canonical link if none is specified
-    not all links available for each class. see
-    https://www.statsmodels.org/stable/glm.html#families
-    for details
+    penalty: string or None, default None
+    one of ['l1', 'l2', 'elasticnet', None]
+    norm to use in regularization penalty
+
+    C: float > 0, default 1.0
+    inverse of regularization strength - small values
+    imply more regularization. Can also be an array
+    matching the length of the number of model parameters.
+
+    l1_ratio: 0 <= float <= 1.0, default 0.5
+    elasticnet penalty ratio, only applies when
+    penalty='elasticnet'. see
+    https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
 
     fit_intercept: bool, default=True
         whether to add an intercept column to X
     '''
-    def __init__(self, family, link=None, fit_intercept=True):
-        # self.family = family(link)
+    def __init__(self, family, penalty=None, C=1.0, l1_ratio=0.5, fit_intercept=True):
         self.family = family
+        self.penalty = penalty
+        self.C = C
+        self.l1_ratio = l1_ratio
+        self._override_l1_ratio()
         self.fit_intercept = fit_intercept
+
+    def _override_l1_ratio(self):
+        '''Overrides l1 ratio if l1 or l2 set'''
+        if self.penalty == 'l1':
+            self.l1_ratio = 1.0
+        elif self.penalty == 'l2':
+            self.l2_ratio = 0.0
+        return self
 
     @property
     def coef_(self):
@@ -100,7 +119,13 @@ class GLM(BaseEstimator):
         if self.fit_intercept:
             X = self._add_intercept(X)
         self.glm = sm.GLM(y, X, family=self.family, offset=offset, freq_weights=sample_weight)
-        self.glm = self.glm.fit(start_params=self.family.irls_init(X, y))
+        if self.penalty is None:
+            self.glm = self.glm.fit(start_params=self.family.irls_init(X, y))
+        else:
+            self.glm = self.glm.fit_regularized(method='elasticnet',
+                alpha=1.0/self.C,
+                start_params=self.family.irls_init(X, y),
+                L1_wt=self.l1_ratio)
         return self
 
     def predict(self, X):
