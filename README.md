@@ -6,6 +6,13 @@ glimpy is a Python module for fitting generalized linear models. It's based on t
 ## Installation
 `pip install glimpy`
 
+## Important Notes
+glimpy makes a few important departures from the scikit-learn API 
+
+- Don't Regularize by Default
+- Don't Regularize Intercept by Default
+not implemented yet
+
 ## Getting Started
 Here is an example of a poisson GLM to help get you started
 
