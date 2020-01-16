@@ -54,7 +54,7 @@ class GLM(BaseEstimator):
         if self.penalty == 'l1':
             self.l1_ratio = 1.0
         elif self.penalty == 'l2':
-            self.l2_ratio = 0.0
+            self.l1_ratio = 0.0
         return self
 
     @property
@@ -102,6 +102,25 @@ class GLM(BaseEstimator):
         intercept = np.ones((n_rows, 1))
         return np.hstack([intercept, X])
 
+    def _penalty_array(self, X):
+        """Creates an array of regularization penalties
+
+        Note that we don't penalize the intercept coefficient
+        If you really want to penalize the intercept, add an
+        intercept to X manually and set fit_intercept=False
+        """
+        if not self.fit_intercept:
+            return 1.0/self.C
+        if isinstance(self.C, (int, float)):
+            pen_array = np.ones(X.shape[1]) / self.C
+            pen_array[0] = 0 # no intercept penalty
+        elif isinstance(self.C, (np.ndarray, list)):
+            pen_array = 1.0 / self.C
+            pen_array = np.concatenate([[0], pen_array])
+        else:
+            raise ValueError('invalid type for C')
+        return pen_array
+
     def fit(self, X, y, sample_weight=None, offset=None):
         """Fits a poisson glm using bfgs
 
@@ -122,8 +141,9 @@ class GLM(BaseEstimator):
         if self.penalty is None:
             self.glm = self.glm.fit(start_params=self.family.irls_init(X, y))
         else:
+            penalty_array = self._penalty_array(X)
             self.glm = self.glm.fit_regularized(method='elastic_net',
-                alpha=1.0/self.C,
+                alpha=penalty_array,
                 start_params=self.family.irls_init(X, y),
                 L1_wt=self.l1_ratio)
         return self

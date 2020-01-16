@@ -72,9 +72,29 @@ def test_l1_poisson():
     X = np.vstack([age, weight]).T
     y = observed_visits
     poisson_glm = GLM(fit_intercept=True, family=Poisson(),
-        penalty='l1', C=0.01)
+        penalty='l1', C=0.0001)
     poisson_glm.fit(X, y)
-    assert poisson_glm.coef_.sum() < 0.1
+    assert poisson_glm.coef_[0] == 0
+    assert np.abs(poisson_glm.intercept_) > 1
+    assert poisson_glm.l1_ratio == 1
+
+def test_l2_poisson():
+    """
+    test a poisson model with l2 regularization
+    """
+    n_samples = 1000
+    int_coef, age_coef, weight_coef = -10, 0.05, 0.08
+    age = np.random.uniform(30, 70, n_samples)
+    weight = np.random.normal(150, 20, n_samples)
+    expected_visits = np.exp(int_coef + age * age_coef + weight * weight_coef)
+    observed_visits = poisson.rvs(expected_visits)
+    X = np.vstack([np.ones(n_samples), age, weight]).T
+    y = observed_visits
+    poisson_glm = GLM(fit_intercept=False, family=Poisson(),
+        penalty='l2', C=0.001)
+    poisson_glm.fit(X, y)
+    assert np.all(np.round(poisson_glm.coef_, 2) == [-0.03, 0.01, 0.03])
+    assert poisson_glm.l1_ratio == 0
 
 
 def test_irls_init():
