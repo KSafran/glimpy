@@ -46,7 +46,7 @@ class Poisson(sm.families.family.Poisson):
         array of reasonable parameter estimates to start IRLS
         '''
         y_0 = np.log(y + 1e-4)
-        params, _, _, _ = np.linalg.lstsq(X, y_0)
+        params, _, _, _ = np.linalg.lstsq(X, y_0, rcond=None)
         return params
 
 class Gamma(sm.families.family.Gamma):
@@ -69,7 +69,7 @@ class Gamma(sm.families.family.Gamma):
         array of reasonable parameter estimates to start IRLS
         '''
         y_0 = 1.0/np.maximum(y, 1e-4)
-        params, _, _, _ = np.linalg.lstsq(X, y_0)
+        params, _, _, _ = np.linalg.lstsq(X, y_0, rcond=None)
         return params
 
 
