@@ -9,17 +9,17 @@ glimpy is a Python module for fitting generalized linear models. It's based on t
 ## Important Notes
 glimpy makes a few important departures from the scikit-learn API 
 
-### Don't Regularize by Default
+#### Don't Regularize by Default
 `sklearn.linear_model.LogisticRegression` regularizes by default. Its 
 regularization paramater `C` is modeled after the SVM regularization parameter 
 so lower values imply more regularization. 
 
 Glimpy does use the `C` parameter to regularize, so lower values imply
 more regularization.
-Glimpy *does not* regularize by default. 
+Glimpy **does not** regularize by default. 
 
-### Don't Penalize Intercept Coefficient
-Scikit-Learn and statsmodels penalize the intercept coefficient. Glimpy *does not* penalize the intercept coefficient when fit with `intercept=True`. If you want the intercept coefficient to be penalized add an intcept term to your dataset `X` and fit with `intercept=False`
+#### Don't Penalize Intercept Coefficient
+Scikit-Learn and statsmodels penalize the intercept coefficient. Glimpy **does not** penalize the intercept coefficient when fit with `intercept=True`. If you want the intercept coefficient to be penalized add an intcept term to your dataset `X` and fit with `intercept=False`
 
 ## Getting Started
 Here is an example of a poisson GLM to help get you started
@@ -74,10 +74,39 @@ x1             0.0499      0.000    301.142      0.000       0.050       0.050
 x2             0.0801      0.000    800.720      0.000       0.080       0.080
 ==============================================================================
 ```
-  
+
+## Scikit-Learn Integration
 The upshot of glimpy is that you can use easily use your favorite scikit-learn tools with glimpy GLMs. For example, you can use the scikit-learn `cross_val_score`
 ```python
 >>> from sklearn.model_selection import cross_val_score
 >>> print(cross_val_score(pglm, X, y, cv=4))
 [263.11969239 288.58713533 205.7032204  220.68304592]
+```
+  
+The following example demonstrates how to use glimpy alongside scikit-learn to perform grid search over elastic-net hyperparameters
+
+```python
+>>> import statsmodels.api as sm
+>>> from glimpy import GLM, Gamma
+>>> from sklearn.preprocessing import StandardScaler
+>>> from sklearn.pipeline import Pipeline
+>>> from sklearn import datasets
+>>> from sklearn.model_selection import GridSearchCV
+>>> 
+>>> diabetes = datasets.load_diabetes()
+>>> 
+>>> scaler = StandardScaler()
+>>> gamma_glm = GLM(fit_intercept=True, family=Gamma(sm.families.links.log()), penalty='elasticnet')
+>>> gamma_pipeline = Pipeline([('scaler', scaler), ('glm', gamma_glm)])
+>>> grid_search = GridSearchCV(gamma_pipeline,
+>>>     param_grid=[{
+>>>         'glm__C': [1e4, 1e5, 1e6],
+>>>         'glm__l1_ratio': [0.1, 0.5, 0.9]
+>>>     }],
+>>>     cv=3
+>>> )
+>>> 
+>>> grid_search.fit(diabetes['data'], diabetes['target'])
+>>> print(grid_search.best_params_)
+{'glm__C': 1000000.0, 'glm__l1_ratio': 0.1}
 ```
