@@ -164,8 +164,11 @@ class GLM(BaseEstimator):
             X = self._add_intercept(X)
         return self.glm.predict(X)
 
-    def score(self, X, y, sample_weight=None, score_fun='deviance'):
-        '''Return the deviance for a fitted GLM
+    def score(self, X, y, sample_weight=None, score_fun='negative_deviance'):
+        '''Return the negative mean deviance for a fitted GLM
+
+        higher scores should be better for interface with
+        sklearn cross validation objects
 
         X: array-like
         2-D array of predictors, shape (n_obs, n_features)
@@ -175,22 +178,22 @@ class GLM(BaseEstimator):
         a 1-D array of offset values
         sample_weights: array-like, optional
         a 1-D array of weight values
-        score_fun: string, default='deviance
-        what score to return, either 'deviance' to
-        return deviance or 'nll' to return negative log
+        score_fun: string, default='negative_deviance'
+        what score to return, either 'negative_deviance' to
+        return negative mean deviance or 'll' to return log
         likelihood
 
         Returns
         =======
-        float of model deviance (or negative log likelihood)
+        float of negative mean residual deviance or log likelihood
         '''
         fitted = self.predict(X)
         if sample_weight is None:
             sample_weight = 1
-        if score_fun == 'deviance':
-            score = self.family.deviance(y, fitted, freq_weights=sample_weight)
-        elif score_fun.lower() == 'nll':
-            score = -self.family.loglike(y, fitted, freq_weights=sample_weight)
+        if score_fun == 'negative_deviance':
+            score = -self.family.deviance(y, fitted, freq_weights=sample_weight)
+        elif score_fun.lower() == 'll':
+            score = self.family.loglike(y, fitted, freq_weights=sample_weight)
         else:
             raise ValueError('score_fun not an accepted scoring function')
         return score
