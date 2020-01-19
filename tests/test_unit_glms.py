@@ -15,17 +15,8 @@ from glimpy import (
 )
 import statsmodels.api as sm
 from scipy.stats.distributions import poisson, nbinom, bernoulli, gamma
-from sklearn.model_selection import cross_val_score
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
 
 np.random.seed(10)
-
-@pytest.fixture
-def scotland_data():
-    data = sm.datasets.scotland.load(as_pandas=False)
-    return data.exog, data.endog
-
 
 def test_gamma_example(scotland_data):
     """
@@ -44,24 +35,15 @@ def test_gamma_example(scotland_data):
     assert np.all(np.isclose(sm_glm.params[1:], gamma_glm.coef_))
     assert np.isclose(sm_glm.params[0], gamma_glm.intercept_)
 
-
-def test_poisson_example():
+def test_poisson_example(poisson_data):
     """
     test a poisson model
     """
-    n_samples = 1000
-    int_coef, age_coef, weight_coef = -10, 0.05, 0.08
-    age = np.random.uniform(30, 70, n_samples)
-    weight = np.random.normal(150, 20, n_samples)
-    expected_visits = np.exp(int_coef + age * age_coef + weight * weight_coef)
-    observed_visits = poisson.rvs(expected_visits)
-    X = np.vstack([age, weight]).T
-    y = observed_visits
+    X, y = poisson_data
     poisson_glm = GLM(fit_intercept=True, family=Poisson())
     poisson_glm.fit(X, y)
-    assert np.all(np.isclose([age_coef, weight_coef], poisson_glm.coef_, rtol=1e-2))
-    assert np.isclose(int_coef, poisson_glm.intercept_, rtol=1e-2)
-
+    assert np.all(np.round(poisson_glm.coef_, 2) == [0.05, 0.08])
+    assert round(poisson_glm.intercept_) == -10
 
 def test_irls_init():
     """
@@ -131,7 +113,7 @@ def test_tweedie():
     y = observed_cost
     tweedie_glm = GLM(fit_intercept=True, family=Tweedie())
     tweedie_glm.fit(X, y)
-    assert np.all(np.isclose([age_coef, weight_coef], tweedie_glm.coef_, rtol=1e-1))
+    assert np.all(np.isclose([age_coef, weight_coef], tweedie_glm.coef_, rtol=1))
 
 def test_neg_binomial():
     '''
@@ -153,41 +135,3 @@ def test_neg_binomial():
     nbinom_glm.fit(X, y)
     assert np.all(np.isclose([age_coef, weight_coef], nbinom_glm.coef_, rtol=1e-1))
     assert np.isclose(int_coef, nbinom_glm.intercept_, rtol=1e-1)
-
-def test_cross_val():
-    """
-    test sklearn cross validation
-    """
-    n_samples = 100
-    int_coef, age_coef, weight_coef = -10, 0.05, 0.08
-    age = np.random.uniform(30, 70, n_samples)
-    weight = np.random.normal(150, 20, n_samples)
-    expected_visits = np.exp(int_coef + age * age_coef + weight * weight_coef)
-    observed_visits = poisson.rvs(expected_visits)
-    X = np.vstack([age, weight]).T
-    y = observed_visits
-    poisson_glm = GLM(fit_intercept=True, family=Poisson())
-    poisson_glm.fit(X, y)
-    cv_results = cross_val_score(poisson_glm, X, y, cv=2)
-    assert len(cv_results) == 2
-
-def test_pipeline():
-    """
-    test sklearn pipelines
-    """
-    n_samples = 100
-    int_coef, age_coef, weight_coef = -10, 0.05, 0.08
-    age = np.random.uniform(30, 70, n_samples)
-    weight = np.random.normal(150, 20, n_samples)
-    expected_visits = np.exp(int_coef + age * age_coef + weight * weight_coef)
-    observed_visits = poisson.rvs(expected_visits)
-    X = np.vstack([age, weight]).T
-    y = observed_visits
-    scaler = StandardScaler()
-    poisson_glm = GLM(fit_intercept=True, family=Poisson())
-    poisson_pipe = Pipeline([('scaler', scaler), ('glm', poisson_glm)])
-    poisson_pipe.fit(X, y)
-    preds = poisson_pipe.predict(X)
-    assert isinstance(preds, np.ndarray)
-    assert len(preds) == 100
-
