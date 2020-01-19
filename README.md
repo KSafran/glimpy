@@ -16,10 +16,10 @@ so lower values imply more regularization.
 
 Glimpy does use the `C` parameter to regularize, so lower values imply
 more regularization.
-Glimpy **does not** regularize by default. 
+**Glimpy does not regularize by default.**
 
 #### Don't Penalize Intercept Coefficient
-Scikit-Learn and statsmodels penalize the intercept coefficient. Glimpy **does not** penalize the intercept coefficient when fit with `intercept=True`. If you want the intercept coefficient to be penalized add an intercept term to your dataset `X` and fit with `intercept=False`
+Scikit-Learn and statsmodels penalize the intercept coefficient. **Glimpy does not penalize the intercept coefficient** when fit with `intercept=True`. If you want the intercept coefficient to be penalized add an intercept term to your dataset `X` and fit with `intercept=False`
 
 ## Getting Started
 Here is an example of a poisson GLM to help get you started
