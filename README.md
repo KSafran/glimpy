@@ -19,7 +19,7 @@ more regularization.
 Glimpy **does not** regularize by default. 
 
 #### Don't Penalize Intercept Coefficient
-Scikit-Learn and statsmodels penalize the intercept coefficient. Glimpy **does not** penalize the intercept coefficient when fit with `intercept=True`. If you want the intercept coefficient to be penalized add an intcept term to your dataset `X` and fit with `intercept=False`
+Scikit-Learn and statsmodels penalize the intercept coefficient. Glimpy **does not** penalize the intercept coefficient when fit with `intercept=True`. If you want the intercept coefficient to be penalized add an intercept term to your dataset `X` and fit with `intercept=False`
 
 ## Getting Started
 Here is an example of a poisson GLM to help get you started
@@ -80,7 +80,7 @@ The upshot of glimpy is that you can use easily use your favorite scikit-learn t
 ```python
 >>> from sklearn.model_selection import cross_val_score
 >>> print(cross_val_score(pglm, X, y, cv=4))
-[263.11969239 288.58713533 205.7032204  220.68304592]
+[-263.11969239 -288.58713533 -205.7032204  -220.68304592]
 ```
   
 The following example demonstrates how to use glimpy alongside scikit-learn to perform grid search over elastic-net hyperparameters
