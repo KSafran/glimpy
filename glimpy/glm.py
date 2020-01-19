@@ -5,14 +5,12 @@ import statsmodels.api as sm
 
 
 class GLM(BaseEstimator):
-    '''Base GLM Class
+    '''GLM Class
 
     Extends the scikit-learn BaseEstimator class which allows
     for simple interaction with scikit-learn API. Properties
     for coef_ and intercept_ attributes allow the classes to
-    conform to the scikit-learn API while allowing the
-    implementation to store all model coefficients together
-    in a single `coefficients` attribute.
+    conform to the scikit-learn API
 
     Models are fit using statsmodels implementation of
     iteratively reweighted least squares. See the
@@ -23,6 +21,9 @@ class GLM(BaseEstimator):
     ==========
     family: statsmodels.family object, required
     https://www.statsmodels.org/stable/glm.html#families
+
+    fit_intercept: bool, default=True
+        whether to add an intercept column to X
 
     penalty: string or None, default None
     one of ['l1', 'l2', 'elasticnet', None]
@@ -38,10 +39,8 @@ class GLM(BaseEstimator):
     penalty='elasticnet'. see
     https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
 
-    fit_intercept: bool, default=True
-        whether to add an intercept column to X
     '''
-    def __init__(self, family, penalty=None, C=1.0, l1_ratio=0.5, fit_intercept=True):
+    def __init__(self, family, fit_intercept=True, penalty=None, C=1.0, l1_ratio=0.5):
         self.family = family
         self.penalty = penalty
         self.C = C
@@ -128,12 +127,15 @@ class GLM(BaseEstimator):
         ==========
         X: array-like
         2-D array of predictors, shape (n_obs, n_features)
+
         y: array-like
         array of response values of length n_obs
-        offset: array-like, optional
-        a 1-D array of offset values
+
         sample_weights: array-like, optional
         a 1-D array of weight values
+
+        offset: array-like, optional
+        a 1-D array of offset values
         """
         if self.fit_intercept:
             X = self._add_intercept(X)
@@ -172,12 +174,16 @@ class GLM(BaseEstimator):
 
         X: array-like
         2-D array of predictors, shape (n_obs, n_features)
+
         y: array-like
         array of response values of length n_obs
+
         offset: array-like, optional
         a 1-D array of offset values
+
         sample_weights: array-like, optional
         a 1-D array of weight values
+
         score_fun: string, default='negative_deviance'
         what score to return, either 'negative_deviance' to
         return negative mean deviance or 'll' to return log
