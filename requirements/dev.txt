@@ -1,5 +1,5 @@
 -r base.txt
 
-ipython==7.11.1
+ipython==7.16.3
 pytest==5.3.2
 twine==3.1.1
